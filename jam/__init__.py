@@ -4,7 +4,7 @@ import click
 from flask import Flask
 
 from jam.api import api_blueprint
-from jam.extensions import db, jwt
+from jam.extensions import db, jwt, migrate
 from jam.models import TokenModel
 from jam.settings import conf
 
@@ -30,6 +30,7 @@ def register_blueprints(app) -> None:
 
 def register_extensions(app):
     db.init_app(app)
+    migrate.init_app(app, db, os.path.join("jam", "migrations"))
     jwt.init_app(app)
 
     @jwt.token_in_blacklist_loader

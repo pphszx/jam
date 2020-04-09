@@ -5,4 +5,4 @@ api_blueprint = Blueprint("api", __name__)
 
 CORS(api_blueprint)
 
-from jam.api.resources import auth, user
+from .resources import auth, user  # noqa
