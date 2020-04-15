@@ -59,7 +59,7 @@ class AuthRegisterAPI(MethodView):
 
 api_blueprint.add_url_rule(
     "/auth/register",
-    view_func=AuthRegisterAPI.as_view("register_api"),
+    view_func=AuthRegisterAPI.as_view("auth_register_api"),
     methods=["POST"],
 )
 
@@ -109,7 +109,7 @@ class AuthTokenAPI(MethodView):
 
 api_blueprint.add_url_rule(
     "/auth/token",
-    view_func=AuthTokenAPI.as_view("token_api"),
+    view_func=AuthTokenAPI.as_view("auth_token_api"),
     methods=["GET", "POST"],
 )
 
@@ -131,7 +131,7 @@ class AuthTokenRefreshAPI(MethodView):
 
 api_blueprint.add_url_rule(
     "/auth/refresh",
-    view_func=AuthTokenRefreshAPI.as_view("refresh_api"),
+    view_func=AuthTokenRefreshAPI.as_view("auth_token_refresh_api"),
     methods=["POST"],
 )
 
@@ -166,7 +166,7 @@ class AuthTokenRevokeAPI(MethodView):
 
 api_blueprint.add_url_rule(
     "/auth/token/<token_id>",
-    view_func=AuthTokenRevokeAPI.as_view("revoke_api"),
+    view_func=AuthTokenRevokeAPI.as_view("auth_token_revoke_api"),
     methods=["PUT"],
 )
 
@@ -188,7 +188,7 @@ class AuthLogoutAccessAPI(MethodView):
 
 api_blueprint.add_url_rule(
     "/auth/logout/access",
-    view_func=AuthLogoutAccessAPI.as_view("logout_access_api"),
+    view_func=AuthLogoutAccessAPI.as_view("auth_logout_access_api"),
     methods=["POST"],
 )
 
@@ -210,6 +210,6 @@ class AuthLogoutRefreshAPI(MethodView):
 
 api_blueprint.add_url_rule(
     "/auth/logout/refresh",
-    view_func=AuthLogoutRefreshAPI.as_view("logout_refresh_api"),
+    view_func=AuthLogoutRefreshAPI.as_view("auth_logout_refresh_api"),
     methods=["POST"],
 )

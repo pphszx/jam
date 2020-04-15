@@ -7,7 +7,7 @@ from jam.models import UserModel
 
 class UserAPI(MethodView):
     """
-    User Registration Resource
+    User Resource
     """
 
     @jwt_required
@@ -20,7 +20,5 @@ class UserAPI(MethodView):
 
 
 api_blueprint.add_url_rule(
-    "/users",
-    view_func=UserAPI.as_view("uset_get_api"),
-    methods=["GET", "DELETE"],
+    "/users", view_func=UserAPI.as_view("user_api"), methods=["GET", "DELETE"],
 )
