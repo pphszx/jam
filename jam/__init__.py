@@ -1,7 +1,9 @@
 import os
 
 import click
-from flask import Flask
+from flask import Flask, request
+from flask_jwt_extended import create_access_token
+from werkzeug.datastructures import Headers
 
 from jam.api import api_blueprint
 from jam.extensions import db, jwt, migrate
@@ -19,6 +21,7 @@ def create_app(config_name=None):
     register_extensions(app)
     register_commands(app)
     register_blueprints(app)
+    register_hooks(app)
     # register_errors(app)
 
     return app
@@ -36,6 +39,32 @@ def register_extensions(app):
     @jwt.token_in_blacklist_loader
     def check_if_token_revoked(decoded_token):
         return TokenModel.is_token_revoked(decoded_token)
+
+
+def register_hooks(app):
+    @app.before_request
+    def inject_jwt():
+        """
+        When jwt is turned off, you can send username instead of Authorizaion
+        in request header to verify identity, and this fuction will add extra
+        jwt for you.
+        In config file, please set the following settings as below to activate
+        automatic jwt injection:
+
+        JWT_ON = False
+        JWT_BLACKLIST_ENABLED = False
+        """
+        if (
+            not app.config.get("JWT_ON", True)
+            and "Authorization" not in request.headers
+            and "username" in request.headers
+        ):
+            access_token = create_access_token(
+                identity=request.headers.get("username")
+            )
+            req_head = dict(request.headers)
+            req_head["Authorization"] = "Bearer " + access_token
+            request.headers = Headers(req_head)
 
 
 def register_errors(app):

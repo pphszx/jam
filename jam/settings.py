@@ -16,6 +16,7 @@ class BaseConfig(object):
     SECRET_KEY = os.getenv("SECRET_KEY", "$secret+string#")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_ON = True
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
 
@@ -26,6 +27,8 @@ class DevelopmentConfig(BaseConfig):
 
 class TestingConfig(BaseConfig):
     TESTING = True
+    JWT_ON = False
+    JWT_BLACKLIST_ENABLED = False
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"  # in-memory database
 

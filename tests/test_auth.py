@@ -1,13 +1,15 @@
 from flask import url_for
 from flask_jwt_extended import decode_token
 
+from jam.models import UserModel, TokenModel
+
 from .base import BaseTestCase
 
 
 class AuthTestCase(BaseTestCase):
     def test_auth_register(self):
         """
-        Register first, then check all users
+        Register first, then find that user
         """
 
         self.client.post(
@@ -15,15 +17,12 @@ class AuthTestCase(BaseTestCase):
             json=dict(username="xyz", password=self.password),
             headers=self._set_auth_headers(self.token_access),
         )
-        response = self.client.get(
-            url_for("api.user_api"),
-            headers=self._set_auth_headers(self.token_access),
-        )
-        self.assertIn({"username": "xyz"}, response.get_json()["users"])
+        target_user = UserModel.find_by_username("xyz")
+        self.assertIsNotNone(target_user)
 
     def test_auth_token(self):
         """
-        Get auth token first, then check all tokens
+        Create auth token first, then find that token
         """
 
         json_post = self.client.post(
@@ -34,22 +33,13 @@ class AuthTestCase(BaseTestCase):
         access_token_jti = decode_token(json_post["access_token"])["jti"]
         refresh_token_jti = decode_token(json_post["refresh_token"])["jti"]
 
-        json_get = self.client.get(
-            url_for("api.auth_token_api"),
-            json=dict(username=self.username, password=self.password),
-            headers=self._set_auth_headers(self.token_access),
-        ).get_json()
-
-        self.assertIn(
-            access_token_jti, [x["jti"] for x in json_get],
-        )
-        self.assertIn(
-            refresh_token_jti, [x["jti"] for x in json_get],
-        )
+        target_tokens = TokenModel.get_user_tokens(self.username)
+        self.assertIn(access_token_jti, [x.jti for x in target_tokens])
+        self.assertIn(refresh_token_jti, [x.jti for x in target_tokens])
 
     def test_auth_token_refresh(self):
         """
-        Refresh auth token first, then check all tokens
+        Refresh auth token first, then find that token
         """
 
         json_post = self.client.post(
@@ -58,15 +48,8 @@ class AuthTestCase(BaseTestCase):
         ).get_json()
         access_token_jti = decode_token(json_post["access_token"])["jti"]
 
-        json_get = self.client.get(
-            url_for("api.auth_token_api"),
-            json=dict(username=self.username, password=self.password),
-            headers=self._set_auth_headers(self.token_access),
-        ).get_json()
-
-        self.assertIn(
-            access_token_jti, [x["jti"] for x in json_get],
-        )
+        target_tokens = TokenModel.get_user_tokens(self.username)
+        self.assertIn(access_token_jti, [x.jti for x in target_tokens])
 
     def test_auth_token_revoke(self):
         """
@@ -79,13 +62,9 @@ class AuthTestCase(BaseTestCase):
             headers=self._set_auth_headers(self.token_access),
         )
 
-        json_get = self.client.get(
-            url_for("api.auth_token_api"),
-            json=dict(username=self.username, password=self.password),
-            headers=self._set_auth_headers(self.token_access),
-        ).get_json()
+        target_tokens = TokenModel.get_user_tokens(self.username)
 
-        self.assertTrue(json_get[1]["revoked"])
+        self.assertTrue(target_tokens[1].revoked)
 
     def test_auth_logout_access(self):
         """
@@ -97,12 +76,8 @@ class AuthTestCase(BaseTestCase):
             headers=self._set_auth_headers(self.token_access),
         )
 
-        json_get = self.client.post(
-            url_for("api.auth_logout_access_api"),
-            headers=self._set_auth_headers(self.token_access),
-        ).get_json()
-
-        self.assertEqual(json_get["msg"], "Token has been revoked")
+        target_tokens = TokenModel.get_user_tokens(self.username)
+        self.assertTrue(target_tokens[0].revoked)
 
     def test_auth_logout_refresh(self):
         """
@@ -114,9 +89,5 @@ class AuthTestCase(BaseTestCase):
             headers=self._set_auth_headers(self.token_refresh),
         )
 
-        json_get = self.client.post(
-            url_for("api.auth_logout_refresh_api"),
-            headers=self._set_auth_headers(self.token_refresh),
-        ).get_json()
-
-        self.assertEqual(json_get["msg"], "Token has been revoked")
+        target_tokens = TokenModel.get_user_tokens(self.username)
+        self.assertTrue(target_tokens[1].revoked)
