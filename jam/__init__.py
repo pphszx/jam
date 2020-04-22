@@ -13,10 +13,11 @@ from jam.settings import conf
 
 def create_app(config_name=None):
     if config_name is None:
-        config_name = os.getenv("FLASK_CONFIG", "development")
+        config_name = os.getenv("JAM_CONFIG", "default")
 
     app = Flask("jam")
     app.config.from_object(conf[config_name])
+    conf[config_name].init_app(app)
 
     register_extensions(app)
     register_commands(app)
