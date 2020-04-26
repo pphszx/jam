@@ -1,0 +1,60 @@
+x-jam-build: &jam-build
+  context: .
+  dockerfile: Dockerfile
+
+x-jam-depends-on: &jam-depends-on
+  - db
+  - redis
+x-jam-volumes: &jam-volumes
+  - .:/app
+
+version: '3.7'
+
+services:
+  redis:
+    image: redis:3.2
+    container_name: jam_cache
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - redis:/data
+
+  db:
+    image: mariadb:10
+    container_name: jam_db
+    env_file: docker/.env
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:3306:3306'
+    volumes:
+      - db_home:/var/lib/mysql
+
+  jam:
+    image: jam
+    build: *jam-build
+    container_name: jam_app
+    env_file: docker/.env
+    restart: unless-stopped
+    ports:
+      - 5000:5000
+      - 8080:8080
+    depends_on: *jam-depends-on
+    volumes: *jam-volumes
+
+  jam-init:
+    image: jam
+    build: *jam-build
+    container_name: jam_init
+    command: ['bash', '/app/docker/docker-init.sh']
+    env_file: docker/.env
+    depends_on: *jam-depends-on
+    volumes: *jam-volumes
+
+volumes:
+  jam_home:
+    external: false
+  db_home:
+    external: false
+  redis:
+    external: false

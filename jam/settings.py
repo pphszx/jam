@@ -71,15 +71,17 @@ class ProductionConfig(BaseConfig):
                 DATABASE_PORT,
                 DATABASE_DB,
             )
-            app.config.from_mapping(
+            if app.config.from_mapping(
                 {"SQLALCHEMY_DATABASE_URI": SQLALCHEMY_DATABASE_URI}
-            )
-            app.logger.warning("Loaded your production configuration from env")
+            ):
+                app.logger.warning(
+                    "Loaded your production configuration from env"
+                )
 
 
 conf = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "production": ProductionConfig,
-    "default": ProductionConfig,
+    "default": DevelopmentConfig,
 }
