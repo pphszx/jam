@@ -37,8 +37,7 @@ services:
     env_file: docker/.env
     restart: unless-stopped
     ports:
-      - 5000:5000
-      - 8080:8080
+      - 8080:5000
     depends_on: *jam-depends-on
     volumes: *jam-volumes
 
