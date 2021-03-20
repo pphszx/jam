@@ -10,7 +10,7 @@ gevent==20.4.0                  # For gunicorn
 greenlet==0.4.15                # via gevent
 gunicorn==20.0.4                # For Docker
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 Mako==1.1.2                     # via alembic
 MarkupSafe==1.1.1
 mysqlclient==1.4.6
