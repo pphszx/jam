@@ -14,7 +14,7 @@ Jinja2==2.11.2
 Mako==1.1.2                     # via alembic
 MarkupSafe==1.1.1
 mysqlclient==1.4.6
-PyJWT==1.7.1                    # via Flask-JWT-Extended
+PyJWT==2.4.0                    # via Flask-JWT-Extended
 python-dateutil==2.8.1          # via alembic
 python-dotenv==0.13.0
 python-editor==1.0.4            # via alembic
